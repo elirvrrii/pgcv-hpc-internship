@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 2 — GitHub & VS Code · UP PGC Visayas HPC Internship</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0d1117;
+    --bg2:      #161b22;
+    --bg3:      #1c2230;
+    --bg4:      #21262d;
+    --border:   #30363d;
+    --border2:  #3d444d;
+    --gh:       #238636;
+    --gh-hover: #2ea043;
+    --gh-light: rgba(35,134,54,.15);
+    --vsc:      #007acc;
+    --vsc-light:rgba(0,122,204,.15);
+    --accent:   #f78166;
+    --yellow:   #e3b341;
+    --purple:   #a371f7;
+    --text:     #c9d1d9;
+    --text-dim: #6e7681;
+    --text-bright: #f0f6fc;
+    --mono:     'JetBrains Mono', monospace;
+    --display:  'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* Subtle dot grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, rgba(48,54,61,.8) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── TOP NAV ── */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 48px; padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 12px;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; }
+  .nav-logo {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: var(--bg2); border: 1px solid var(--border);
+    display: grid; place-items: center; font-size: 18px;
+  }
+  .nav-title { font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--text-bright); }
+  .nav-sub { font-size: 11px; color: var(--text-dim); }
+  .week-nav { display: flex; gap: 6px; }
+  .week-btn {
+    font-family: var(--mono); font-size: 11px;
+    padding: 5px 12px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--bg2);
+    color: var(--text-dim); transition: all .15s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .week-btn.active { background: var(--gh-light); border-color: var(--gh); color: #3fb950; }
+  .week-btn:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+  /* ── HERO ── */
+  .hero { margin-bottom: 36px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+    color: #3fb950; background: var(--gh-light);
+    border: 1px solid rgba(35,134,54,.4);
+    border-radius: 6px; padding: 5px 12px; margin-bottom: 18px;
+  }
+  .dot-live { width: 7px; height: 7px; border-radius: 50%; background: #3fb950; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(30px, 5vw, 48px);
+    font-weight: 800; color: var(--text-bright);
+    line-height: 1.1; letter-spacing: -.02em;
+    margin-bottom: 14px;
+  }
+  h1 .gh { color: #3fb950; }
+  h1 .vsc { color: var(--vsc); }
+
+  .hero-desc { font-size: 14px; color: var(--text-dim); line-height: 1.8; max-width: 600px; }
+  .hero-desc strong { color: var(--text); font-weight: 500; }
+
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: flex; align-items: center; gap: 0;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px; margin: 28px 0 36px;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .pipe-step {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--text-dim);
+  }
+  .pipe-icon {
+    width: 30px; height: 30px; border-radius: 6px;
+    display: grid; place-items: center; font-size: 15px;
+    background: var(--bg3); border: 1px solid var(--border);
+  }
+  .pipe-label { font-size: 11px; }
+  .pipe-label strong { display: block; color: var(--text); font-size: 12px; }
+  .pipe-arrow { color: var(--text-dim); margin: 0 8px; font-size: 14px; }
+  @media (max-width: 520px) { .pipe-arrow { display: none; } }
+
+  /* ── STATS ── */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 10px; margin-bottom: 28px; }
+  .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .stat-val { font-family: var(--display); font-size: 26px; font-weight: 700; color: var(--text-bright); line-height: 1; }
+  .stat-lbl { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  /* ── PROGRESS ── */
+  .prog-wrap { margin-bottom: 36px; }
+  .prog-head { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 11px; color: var(--text-dim); }
+  .prog-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gh), #3fb950); transition: width .4s; }
+
+  /* ── SECTION HEADERS ── */
+  .section-hdr {
+    display: flex; align-items: center; gap: 10px;
+    margin: 36px 0 14px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: grid; place-items: center; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .icon-gh { background: var(--gh-light); border: 1px solid rgba(35,134,54,.3); }
+  .icon-vsc { background: var(--vsc-light); border: 1px solid rgba(0,122,204,.3); }
+  .icon-flow { background: rgba(163,113,247,.1); border: 1px solid rgba(163,113,247,.3); }
+  .section-title { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--text-bright); }
+  .section-badge {
+    margin-left: auto; font-size: 10px;
+    padding: 3px 8px; border-radius: 4px; font-family: var(--mono);
+  }
+  .badge-gh { background: var(--gh-light); color: #3fb950; border: 1px solid rgba(35,134,54,.3); }
+  .badge-vsc { background: var(--vsc-light); color: #58a6ff; border: 1px solid rgba(0,122,204,.3); }
+  .badge-flow { background: rgba(163,113,247,.1); color: var(--purple); border: 1px solid rgba(163,113,247,.3); }
+
+  /* ── MODULES ── */
+  .modules { display: flex; flex-direction: column; gap: 10px; }
+
+  .module {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    transition: border-color .2s;
+  }
+  .module:hover { border-color: var(--border2); }
+  .module.open { border-color: var(--border2); }
+
+  .mod-hdr {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px; cursor: pointer;
+    user-select: none; transition: background .12s;
+  }
+  .mod-hdr:hover { background: var(--bg3); }
+
+  .mod-num { font-size: 11px; font-weight: 700; color: var(--text-dim); min-width: 24px; }
+  .mod-ico {
+    width: 30px; height: 30px; border-radius: 6px;
+    display: grid; place-items: center; font-size: 15px; flex-shrink: 0;
+  }
+  .mod-ico-gh { background: var(--gh-light); }
+  .mod-ico-vsc { background: var(--vsc-light); }
+  .mod-ico-flow { background: rgba(163,113,247,.1); }
+
+  .mod-info { flex: 1; min-width: 0; }
+  .mod-title { font-size: 13px; font-weight: 600; color: var(--text-bright); }
+  .mod-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  .mod-cnt {
+    font-size: 11px; color: var(--text-dim);
+    background: var(--bg3); border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+  }
+  .mod-chev { color: var(--text-dim); transition: transform .2s; font-size: 12px; flex-shrink: 0; }
+  .module.open .mod-chev { transform: rotate(180deg); }
+
+  /* ── TASK BODY ── */
+  .mod-body { display: none; border-top: 1px solid var(--border); }
+  .module.open .mod-body { display: block; }
+
+  /* Info callout */
+  .callout {
+    margin: 12px 18px; padding: 12px 14px;
+    border-radius: 6px; font-size: 12px; line-height: 1.7;
+    border-left: 3px solid;
+  }
+  .callout-green { background: var(--gh-light); border-color: var(--gh); color: #7ee787; }
+  .callout-blue { background: var(--vsc-light); border-color: var(--vsc); color: #79c0ff; }
+  .callout-yellow { background: rgba(227,179,65,.1); border-color: var(--yellow); color: var(--yellow); }
+
+  .task {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 1px solid rgba(48,54,61,.6);
+    cursor: pointer; transition: background .1s;
+  }
+  .task:last-child { border-bottom: none; }
+  .task:hover { background: var(--bg3); }
+
+  .task-cb {
+    width: 15px; height: 15px; border-radius: 3px; flex-shrink: 0;
+    border: 1.5px solid var(--border2); margin-top: 1px;
+    display: grid; place-items: center; transition: all .15s;
+  }
+  .task.done .task-cb { background: var(--gh); border-color: var(--gh); }
+  .task.done .task-cb::after { content: '✓'; font-size: 9px; color: #fff; font-weight: 700; }
+
+  .task-step { font-size: 10px; color: var(--text-dim); min-width: 22px; margin-top: 2px; letter-spacing: .02em; }
+  .task-text { font-size: 12px; color: var(--text); line-height: 1.65; flex: 1; }
+  .task.done .task-text { text-decoration: line-through; color: var(--text-dim); }
+
+  code {
+    font-family: var(--mono); font-size: 11px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: #79c0ff; padding: 1px 5px; border-radius: 3px;
+  }
+  .task.done code { opacity: .4; }
+
+  .cmd-block {
+    margin: 8px 18px 4px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 14px; font-size: 11px;
+    color: #7ee787; line-height: 1.9; font-family: var(--mono);
+  }
+  .cmd-block .comment { color: var(--text-dim); }
+
+  /* ── EXTENSIONS LIST ── */
+  .ext-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 18px; }
+  @media (max-width: 520px) { .ext-grid { grid-template-columns: 1fr; } }
+  .ext-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 12px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .ext-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ext-name { font-size: 12px; font-weight: 500; color: var(--text-bright); }
+  .ext-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; line-height: 1.5; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 60px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .footer-txt { font-size: 11px; color: var(--text-dim); }
+  .reset-btn {
+    font-family: var(--mono); font-size: 11px;
+    padding: 6px 14px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-dim); transition: all .15s;
+  }
+  .reset-btn:hover { border-color: var(--gh); color: #3fb950; }
+
+  @media print {
+    body { background: #fff; color: #000; }
+    body::before { display: none; }
+    .module { border: 1px solid #ccc; break-inside: avoid; }
+    .mod-body { display: block !important; }
+    code { background: #f0f0f0; color: #0050aa; border-color: #ccc; }
+    .reset-btn, .week-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav>
+    <div class="nav-brand">
+      <div class="nav-logo">🖥️</div>
+      <div>
+        <div class="nav-title">UP PGC Visayas · HPC Internship</div>
+        <div class="nav-sub">Systems Administration · 2025</div>
+      </div>
+    </div>
+    <div class="week-nav">
+      <span class="week-btn">Wk 1: Linux</span>
+      <span class="week-btn active">Wk 2: Git & VSC</span>
+      <span class="week-btn">Wk 3: Vercel</span>
+      <span class="week-btn">Wk 4: Security</span>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-tag"><span class="dot-live"></span> Week 2 of 4</div>
+    <h1>Version Control with<br><span class="gh">GitHub</span> &amp; <span class="vsc">VS Code</span></h1>
+    <p class="hero-desc">Learn industry-standard <strong>Git workflows</strong>, collaborate using <strong>GitHub</strong>, and write code efficiently in <strong>Visual Studio Code</strong>. You'll push your Week 1 HTML to a live repository by end of week.</p>
+  </section>
+
+  <!-- Pipeline diagram -->
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="pipe-icon">📝</div>
+      <div class="pipe-label"><strong>VS Code</strong>Write & edit code</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🔀</div>
+      <div class="pipe-label"><strong>Git</strong>Stage & commit</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🐙</div>
+      <div class="pipe-label"><strong>GitHub</strong>Push & review</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🔁</div>
+      <div class="pipe-label"><strong>Pull Request</strong>Collaborate</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="pipe-icon">✅</div>
+      <div class="pipe-label"><strong>Merge</strong>Ship to main</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Tasks done</div></div>
+    <div class="stat"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total tasks</div></div>
+    <div class="stat"><div class="stat-val" id="s-pct">0%</div><div class="stat-lbl">Progress</div></div>
+    <div class="stat"><div class="stat-val">7</div><div class="stat-lbl">Modules</div></div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-head">
+      <span>// week2_progress</span>
+      <span id="pct-txt">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  </div>
+
+  <!-- ═══════════════════ SECTION: GITHUB ═══════════════════ -->
+  <div class="section-hdr">
+    <div class="section-icon icon-gh">🐙</div>
+    <div class="section-title">Part A — GitHub Setup & Git Basics</div>
+    <span class="section-badge badge-gh">Day 1–2</span>
+  </div>
+
+  <div class="modules">
+
+    <!-- MOD 1 -->
+    <div class="module open" id="mod-1">
+      <div class="mod-hdr" onclick="tog('mod-1')">
+        <span class="mod-num">01</span>
+        <div class="mod-ico mod-ico-gh">🔧</div>
+        <div class="mod-info">
+          <div class="mod-title">Git Installation & Global Configuration</div>
+          <div class="mod-meta">Day 1 · ~30 mins · Ubuntu Server & local machine</div>
+        </div>
+        <span class="mod-cnt" id="cnt-mod-1">0 / 7</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        <div class="callout callout-green">Best practice: Always configure Git with your real name and institutional email before making any commits. This ensures proper attribution in the team repository.</div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">01</span><span class="task-text">Install Git on Ubuntu: <code>sudo apt install git -y</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">02</span><span class="task-text">Verify installation: <code>git --version</code> — should show <code>git version 2.x.x</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">03</span><span class="task-text">Set your name globally: <code>git config --global user.name "Your Full Name"</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">04</span><span class="task-text">Set your email: <code>git config --global user.email "you@up.edu.ph"</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">05</span><span class="task-text">Set default branch name to main: <code>git config --global init.defaultBranch main</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">06</span><span class="task-text">Set preferred editor to nano: <code>git config --global core.editor nano</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">07</span><span class="task-text">Verify all settings: <code>git config --global --list</code></span></div>
+      </div>
+    </div>
+
+    <!-- MOD 2 -->
+    <div class="module" id="mod-2">
+      <div class="mod-hdr" onclick="tog('mod-2')">
+        <span class="mod-num">02</span>
+        <div class="mod-ico mod-ico-gh">🔑</div>
+        <div class="mod-info">
+          <div class="mod-title">Create GitHub Account & SSH Key Authentication</div>
+          <div class="mod-meta">Day 1 · ~45 mins · github.com</div>
+        </div>
+        <span class="mod-cnt" id="cnt-mod-2">0 / 8</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        <div class="callout callout-green">Best practice: Always use SSH keys for GitHub authentication — never save your password in the terminal. SSH keys are more secure and don't expire.</div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">01</span><span class="task-text">Create a free account at <code>github.com</code> using your institutional email</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">02</span><span class="task-text">Enable 2-Factor Authentication (2FA) under Settings → Password and Authentication</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">03</span><span class="task-text">Generate a new SSH key: <code>ssh-keygen -t ed25519 -C "you@up.edu.ph"</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">04</span><span class="task-text">Start SSH agent and add key: <code>eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">05</span><span class="task-text">Copy your public key: <code>cat ~/.ssh/id_ed25519.pub</code> — copy the entire output</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">06</span><span class="task-text">Add SSH key to GitHub: Settings → SSH and GPG Keys → New SSH Key → paste key</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">07</span><span class="task-text">Test connection: <code>ssh -T git@github.com</code> — expected: "Hi username! You've successfully authenticated"</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">08</span><span class="task-text">Set up a GitHub profile: add a photo, bio, and your school/organization</span></div>
+      </div>
+    </div>
+
+    <!-- MOD 3 -->
+    <div class="module" id="mod-3">
+      <div class="mod-hdr" onclick="tog('mod-3')">
+        <span class="mod-num">03</span>
+        <div class="mod-ico mod-ico-gh">📁</div>
+        <div class="mod-info">
+          <div class="mod-title">Create Repository & Push Week 1 HTML</div>
+          <div class="mod-meta">Day 1–2 · ~1 hour · First real commit!</div>
+        </div>
+        <span class="mod-cnt" id="cnt-mod-3">0 / 9</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        <div class="callout callout-green">Best practice: Always add a README.md, .gitignore, and a LICENSE to every repository. Never commit sensitive files like passwords, SSH keys, or .env files.</div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">01</span><span class="task-text">Create a new public repository on GitHub named <code>pgcv-hpc-internship</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">02</span><span class="task-text">Initialize with a <code>README.md</code> and select <code>.gitignore</code> template: Node</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">03</span><span class="task-text">Clone the repository to your local machine: <code>git clone git@github.com:username/pgcv-hpc-internship.git</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">04</span><span class="task-text">Create a <code>week1/</code> folder inside the repo and copy your <code>week1_hpc_internship.html</code> into it</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">05</span><span class="task-text">Stage the file: <code>git add week1/week1_hpc_internship.html</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">06</span><span class="task-text">Commit with a proper message: <code>git commit -m "feat: add week1 HPC internship lab checklist"</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">07</span><span class="task-text">Push to GitHub: <code>git push origin main</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">08</span><span class="task-text">Verify the file appears on your GitHub repository page</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">09</span><span class="task-text">Update <code>README.md</code>: describe the project, list tech used, add your name — commit and push</span></div>
+      </div>
+    </div>
+
+    <!-- MOD 4 -->
+    <div class="module" id="mod-4">
+      <div class="mod-hdr" onclick="tog('mod-4')">
+        <span class="mod-num">04</span>
+        <div class="mod-ico mod-ico-gh">🌿</div>
+        <div class="mod-info">
+          <div class="mod-title">Branching, Pull Requests & Collaboration</div>
+          <div class="mod-meta">Day 2 · ~1.5 hours · Team exercise</div>
+        </div>
+        <span class="mod-cnt" id="cnt-mod-4">0 / 8</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        <div class="callout callout-yellow">Team exercise: Pair up with another intern. One person owns the repo, the other forks and submits a Pull Request. Then swap roles.</div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">01</span><span class="task-text">Create a new feature branch: <code>git checkout -b feature/week2-github-notes</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">02</span><span class="task-text">Create a <code>week2/</code> folder, add a <code>notes.md</code> file with what you learned today</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">03</span><span class="task-text">Stage and commit: <code>git add . && git commit -m "docs: add week2 github setup notes"</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">04</span><span class="task-text">Push the branch: <code>git push origin feature/week2-github-notes</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">05</span><span class="task-text">Open a Pull Request on GitHub: compare your branch → main, write a description</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">06</span><span class="task-text">Request a review from your paired intern — leave at least one comment on their PR</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">07</span><span class="task-text">Merge the PR after approval — use <strong>Squash and merge</strong> strategy</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">08</span><span class="task-text">Delete the feature branch after merge, both locally and on GitHub</span></div>
+      </div>
+    </div>
+
+  </div><!-- /modules part A -->
+
+  <!-- ═══════════════════ SECTION: VS CODE ═══════════════════ -->
+  <div class="section-hdr">
+    <div class="section-icon icon-vsc">💻</div>
+    <div class="section-title">Part B — VS Code Setup & Workflow</div>
+    <span class="section-badge badge-vsc">Day 3–4</span>
+  </div>
+
+  <div class="modules">
+
+    <!-- MOD 5 -->
+    <div class="module" id="mod-5">
+      <div class="mod-hdr" onclick="tog('mod-5')">
+        <span class="mod-num">05</span>
+        <div class="mod-ico mod-ico-vsc">🧩</div>
+        <div class="mod-info">
+          <div class="mod-title">VS Code Installation & Essential Extensions</div>
+          <div class="mod-meta">Day 3 · ~1 hour · Local machine setup</div>
+        </div>
+        <span class="mod-cnt" id="cnt-mod-5">0 / 7</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        <div class="callout callout-blue">Best practice: Keep extensions minimal — only install what you actively use. Too many extensions slow VS Code down.</div>
+
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">01</span><span class="task-text">Download and install VS Code from <code>code.visualstudio.com</code> (choose your OS)</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">02</span><span class="task-text">Sign in with GitHub account to sync settings: Accounts icon → Sign in with GitHub</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">03</span><span class="task-text">Enable Settings Sync so your config is backed up to GitHub automatically</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">04</span><span class="task-text">Install the 6 essential extensions listed below (click Extensions icon or press <code>Ctrl+Shift+X</code>)</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">05</span><span class="task-text">Configure auto-save: Settings → <code>files.autoSave</code> → set to <code>afterDelay</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">06</span><span class="task-text">Set default formatter to Prettier: Settings → <code>editor.defaultFormatter</code> → <code>esbenp.prettier-vscode</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">07</span><span class="task-text">Enable format on save: Settings → <code>editor.formatOnSave</code> → <code>true</code></span></div>
+
+        <div class="ext-grid">
+          <div class="ext-card"><div class="ext-icon">🦊</div><div><div class="ext-name">GitLens</div><div class="ext-desc">See who changed each line, blame annotations, commit history inline</div></div></div>
+          <div class="ext-card"><div class="ext-icon">✨</div><div><div class="ext-name">Prettier</div><div class="ext-desc">Auto-format HTML, CSS, JS on save — consistent code style</div></div></div>
+          <div class="ext-card"><div class="ext-icon">🖥️</div><div><div class="ext-name">Remote – SSH</div><div class="ext-desc">Connect directly to your HPC Ubuntu server and edit files remotely</div></div></div>
+          <div class="ext-card"><div class="ext-icon">🌐</div><div><div class="ext-name">Live Server</div><div class="ext-desc">Preview HTML files with hot-reload in your browser locally</div></div></div>
+          <div class="ext-card"><div class="ext-icon">🎨</div><div><div class="ext-name">GitHub Theme</div><div class="ext-desc">Official GitHub dark/light color theme — matches github.com</div></div></div>
+          <div class="ext-card"><div class="ext-icon">📄</div><div><div class="ext-name">indent-rainbow</div><div class="ext-desc">Colorizes indentation levels — prevents YAML and HTML indent errors</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOD 6 -->
+    <div class="module" id="mod-6">
+      <div class="mod-hdr" onclick="tog('mod-6')">
+        <span class="mod-num">06</span>
+        <div class="mod-ico mod-ico-vsc">🔗</div>
+        <div class="mod-info">
+          <div class="mod-title">Remote SSH into HPC Server via VS Code</div>
+          <div class="mod-meta">Day 3 · ~45 mins · Edit server files from your laptop</div>
+        </div>
+        <span class="mod-cnt" id="cnt-mod-6">0 / 6</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        <div class="callout callout-blue">This is a powerful skill — you can edit files on the remote HPC server as if they were local, with full VS Code features like autocomplete, linting, and Git integration.</div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">01</span><span class="task-text">Open Command Palette: <code>Ctrl+Shift+P</code> → type <code>Remote-SSH: Connect to Host</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">02</span><span class="task-text">Add new SSH host: enter <code>ssh username@server-ip</code> and save to <code>~/.ssh/config</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">03</span><span class="task-text">Connect and wait for VS Code Server to install on the remote machine</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">04</span><span class="task-text">Open your home directory on the server: File → Open Folder → <code>/home/username</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">05</span><span class="task-text">Edit the Week 1 HTML file directly on the server — save and verify changes</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">06</span><span class="task-text">Open the integrated terminal: <code>Ctrl+`</code> — you now have a full shell on the HPC server</span></div>
+      </div>
+    </div>
+
+    <!-- MOD 7 -->
+    <div class="module" id="mod-7">
+      <div class="mod-hdr" onclick="tog('mod-7')">
+        <span class="mod-num">07</span>
+        <div class="mod-ico mod-ico-vsc">🔄</div>
+        <div class="mod-info">
+          <div class="mod-title">Git Workflow Inside VS Code</div>
+          <div class="mod-meta">Day 4 · ~1 hour · Source Control panel</div>
+        </div>
+        <span class="mod-cnt" id="cnt-mod-7">0 / 7</span>
+        <span class="mod-chev">▼</span>
+      </div>
+      <div class="mod-body">
+        <div class="callout callout-blue">Best practice: Write meaningful commit messages using Conventional Commits format — feat:, fix:, docs:, chore: — so the history is readable.</div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">01</span><span class="task-text">Open your cloned repository in VS Code: <code>File → Open Folder</code> → select <code>pgcv-hpc-internship</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">02</span><span class="task-text">Click the Source Control icon (branch icon) in the left sidebar — explore the panel</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">03</span><span class="task-text">Make a change to <code>README.md</code> — notice the file appears under Changes in Source Control</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">04</span><span class="task-text">Stage the file by clicking the <code>+</code> icon — or stage all with <code>Stage All Changes</code></span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">05</span><span class="task-text">Write a commit message in the input box and press <code>Ctrl+Enter</code> to commit</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">06</span><span class="task-text">Push to GitHub using the sync button in the status bar or Source Control → Push</span></div>
+        <div class="task" onclick="chk(this)"><div class="task-cb"></div><span class="task-step">07</span><span class="task-text">Use GitLens to view the commit history: click any line → see who wrote it and when</span></div>
+
+        <div class="cmd-block">
+          <span class="comment"># Conventional commit message format (best practice)</span><br>
+          feat: add new feature<br>
+          fix: correct a bug<br>
+          docs: update README or comments<br>
+          chore: update packages or config<br>
+          refactor: restructure code without changing behavior<br>
+          style: formatting changes only
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /modules part B -->
+
+  <footer>
+    <div class="footer-txt">UP PGC Visayas · HPC Internship · Week 2: GitHub & VS Code</div>
+    <button class="reset-btn" onclick="resetAll()">↺ Reset checklist</button>
+  </footer>
+
+</div>
+
+<script>
+  const MODS = ['mod-1','mod-2','mod-3','mod-4','mod-5','mod-6','mod-7'];
+
+  function tog(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+  function chk(row) {
+    row.classList.toggle('done');
+    updateModCnt(row.closest('.module'));
+    updateGlobal();
+    save();
+  }
+  function updateModCnt(el) {
+    const id = el.id;
+    const t = el.querySelectorAll('.task').length;
+    const d = el.querySelectorAll('.task.done').length;
+    const c = document.getElementById('cnt-' + id);
+    if (c) c.textContent = d + ' / ' + t;
+  }
+  function updateGlobal() {
+    const all = document.querySelectorAll('.task');
+    const done = document.querySelectorAll('.task.done');
+    const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+    document.getElementById('s-done').textContent = done.length;
+    document.getElementById('s-total').textContent = all.length;
+    document.getElementById('s-pct').textContent = pct + '%';
+    document.getElementById('pct-txt').textContent = pct + '%';
+    document.getElementById('prog').style.width = pct + '%';
+  }
+  function resetAll() {
+    document.querySelectorAll('.task.done').forEach(t => t.classList.remove('done'));
+    MODS.forEach(id => { const el = document.getElementById(id); if(el) updateModCnt(el); });
+    updateGlobal(); save();
+  }
+  function save() {
+    try {
+      const state = [...document.querySelectorAll('.task')].map(t => t.classList.contains('done'));
+      localStorage.setItem('hpc_week2', JSON.stringify(state));
+    } catch(e){}
+  }
+  function load() {
+    try {
+      const state = JSON.parse(localStorage.getItem('hpc_week2') || '[]');
+      const tasks = document.querySelectorAll('.task');
+      state.forEach((d, i) => { if(d && tasks[i]) { tasks[i].classList.add('done'); updateModCnt(tasks[i].closest('.module')); } });
+      updateGlobal();
+    } catch(e){}
+  }
+  MODS.forEach(id => { const el = document.getElementById(id); if(el) updateModCnt(el); });
+  updateGlobal();
+  load();
+</script>
+</body>
+</html>
